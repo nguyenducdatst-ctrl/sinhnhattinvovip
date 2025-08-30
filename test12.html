@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chúc mừng sinh nhật Tín Võ Vip 🎂</title>
+<style>
+  body {
+    margin: 0;
+    padding: 1em;
+    min-height: 100vh;
+    background: linear-gradient(135deg,#ff9d4d,#ff7033);
+    font-family: 'Poppins', sans-serif;
+    color: gold;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* canh giữa theo chiều dọc */
+    align-items: center;
+  }
+  h1 {
+    font-size: clamp(28px,6vw,52px);
+    margin: 0.2em 0 0.3em 0;
+    position: relative;
+    z-index: 3;
+  }
+  p {
+    font-size: clamp(16px,3vw,22px);
+    line-height: 1.4;
+    max-width: 700px;
+    margin: 0.2em auto 0.5em auto;
+    position: relative;
+    z-index: 3;
+  }
+
+  .photos {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 3;
+  }
+  .photos img {
+    width: 220px;
+    height: 220px;
+    border-radius: 20px;
+    object-fit: cover;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    animation: beat 1s infinite;
+  }
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .balloon {
+    position: absolute;
+    bottom: -10%;
+    font-size: 2em;
+    animation: rise 8s linear infinite;
+    opacity: .8;
+    pointer-events: none;
+    z-index: 2;
+  }
+  @keyframes rise {
+    to { transform: translateY(-120vh) rotate(15deg); opacity: .1; }
+  }
+
+  #fireworks {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+</style>
+
+</head>
+<body>
+  <!-- Nhạc -->
+  <audio id="song" autoplay loop>
+    <source src="Cua.mp3" type="audio/mpeg">
+    Trình duyệt của bạn không hỗ trợ phát nhạc.
+  </audio>
+
+  <h1>Ê cu, chúc em sinh nhật vui vẻ nha, Tín Võ Vip! 🥳</h1>
+  <p>
+    Chúc em Zín tuổi mới phát tài phát lộc, phu thê viên mãn, giáng sinh an lành, cùng những điều hay, ý tốt sẽ đến với em Tín.<br>
+    <b>P/s:</b> Mong em tương tác nhiều hơn trong nhóm, mặc dù toàn t với huy nói xàm là chủ yếu 🐧
+  </p>
+
+
+  <!-- Ảnh tín -->
+  <div class="photos">
+    <img src="925aecf6-6018-40ef-b905-f871138333fc.jpg">
+    <img src="f573a590-d138-488e-9ebd-cb5e2caf82ed.jpg">
+    <img src="78a6e944-881e-4e28-8d6b-9d5599a5e00f.jpg">
+  </div>
+
+  <!-- Canvas pháo hoa -->
+  <canvas id="fireworks"></canvas>
+
+  <script>
+  
+    document.body.addEventListener('click', ()=>{
+      document.getElementById('song').play().catch(()=>{});
+    });
+
+    // 🎈 Bóng bay
+    function spawnBalloon() {
+      const b = document.createElement('div');
+      b.className = 'balloon';
+      b.textContent = ['🎈','🎉','🎂','🥳'][Math.floor(Math.random()*4)];
+      b.style.left = Math.random() * 100 + '%';
+      b.style.fontSize = (24 + Math.random()*24) + 'px';
+      document.body.appendChild(b);
+      setTimeout(() => b.remove(), 8000);
+    }
+    setInterval(spawnBalloon, 600);
+    for (let i=0;i<10;i++) setTimeout(spawnBalloon,i*300);
+
+    //  Fireworks
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    resize();
+    window.addEventListener("resize", resize);
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function random(min,max){return Math.random()*(max-min)+min;}
+
+    class Particle {
+      constructor(x,y,color){
+        this.x=x;this.y=y;this.color=color;
+        this.radius=random(2,4);
+        this.angle=random(0,2*Math.PI);
+        this.speed=random(1,6);
+        this.life=100;
+      }
+      update(){
+        this.x+=Math.cos(this.angle)*this.speed;
+        this.y+=Math.sin(this.angle)*this.speed;
+        this.speed*=0.98;
+        this.life--;
+      }
+      draw(){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.radius,0,2*Math.PI);
+        ctx.fillStyle=this.color;
+        ctx.fill();
+      }
+    }
+
+    function createFirework(){
+      const x=random(100,canvas.width-100);
+      const y=random(50,canvas.height/2);
+      const colors=["#ff595e","#ffca3a","#8ac926","#1982c4","#6a4c93","#ffffff"];
+      for(let i=0;i<50;i++){
+        particles.push(new Particle(x,y,colors[Math.floor(Math.random()*colors.length)]));
+      }
+    }
+
+    function animate(){
+      ctx.fillStyle="rgba(0,0,0,0.2)";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      particles.forEach((p,i)=>{
+        p.update();p.draw();
+        if(p.life<=0)particles.splice(i,1);
+      });
+      requestAnimationFrame(animate);
+    }
+
+    setInterval(createFirework,2000);
+    animate();
+  </script>
+</body>
+</html>
